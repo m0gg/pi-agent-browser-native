@@ -212,15 +212,15 @@ test("buildAgentBrowserSpawnCommand uses the npm cmd shim on Windows", () => {
 	assert.deepEqual(buildAgentBrowserSpawnCommand(["--version"], "darwin"), { command: "agent-browser", args: ["--version"] });
 });
 
-test("process start identity commands use absolute POSIX fallbacks and native PowerShell on Windows", async () => {
+test("process start identity commands use ps on POSIX and native PowerShell on Windows", async () => {
 	const posixCommands = buildProcessStartIdentityCommands(123, "linux");
-	assert.deepEqual(posixCommands.map((command) => command.file), ["/bin/ps", "/usr/bin/ps"]);
+	assert.deepEqual(posixCommands.map((command) => command.file), ["ps"]);
 	const attempts: string[] = [];
 	assert.equal(await resolveProcessStartIdentityFromCommands(posixCommands, async (command) => {
 		attempts.push(command.file);
-		return command.file === "/usr/bin/ps" ? "fallback-identity" : undefined;
+		return command.file === "ps" ? "fallback-identity" : undefined;
 	}), "fallback-identity");
-	assert.deepEqual(attempts, ["/bin/ps", "/usr/bin/ps"]);
+	assert.deepEqual(attempts, ["ps"]);
 	const windows = buildProcessStartIdentityCommand(123, "win32");
 	assert.match(windows?.file ?? "", /(?:^|[\\/])powershell\.exe$/i);
 	assert.equal(win32.isAbsolute(windows?.file ?? ""), true);

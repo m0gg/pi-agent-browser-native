@@ -31,7 +31,7 @@ export function buildProcessStartIdentityCommand(
 		}
 		: {
 			args: ["-p", String(pid), "-o", "lstart="],
-			file: "/bin/ps",
+			file: "ps",
 		};
 }
 
@@ -41,9 +41,7 @@ export function buildProcessStartIdentityCommands(
 ): ProcessStartIdentityCommand[] {
 	const primary = buildProcessStartIdentityCommand(pid, platform);
 	if (!primary) return [];
-	return platform === "win32"
-		? [primary]
-		: [primary, { ...primary, file: "/usr/bin/ps" }];
+	return platform === "win32" ? [primary] : [primary];
 }
 
 export function normalizeProcessStartIdentity(stdout: string): string | undefined {
